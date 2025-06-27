@@ -62,7 +62,7 @@ __pycache__/
 *.sql
 MIGRATION_GUIDE.md
 *mypy_cache/
-*.json
+!*.json
 sample2.txt
 
 test/
