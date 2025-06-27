@@ -217,6 +217,15 @@ def initialize_llm(name: str, model_name: str, temperature: float, top_p: float 
                 temperature=temperature,
                 top_p=top_p if top_p else 1.0
             )
+        elif "llama" in model_name:
+            from langchain_google_vertexai.model_garden_maas import VertexModelGardenLlama
+            llm = VertexModelGardenLlama(
+                project=project,
+                location="us-east5",
+                model_name=model_name,
+                temperature=temperature,
+                top_p=top_p if top_p else 1.0
+            )
         else:
             raise ValueError("VertexAI で不正なモデル名が指定されました。")
 
