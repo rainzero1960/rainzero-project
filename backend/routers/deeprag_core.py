@@ -49,33 +49,33 @@ agent_llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-preview-04-17", tempe
 summary_llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-preview-05-20", temperature=0.3, max_retries=0)"""
 
 coordinator_llm = initialize_llm(
-        name="Google",
+        name="VertexAI",
         model_name="gemini-2.5-flash",
         temperature=0.0,
         llm_max_retries=0,
     )
 
 planner_llm = initialize_llm(
-        name="Google",
-        model_name="gemini-2.5-flash",
+        name="VertexAI",
+        model_name="gemini-2.5-pro",
         temperature=0.0,
         llm_max_retries=0,
     )
 supervisor_llm = initialize_llm(
-        name="Google",
+        name="VertexAI",
         model_name="gemini-2.5-flash",
         temperature=0.3,
         llm_max_retries=0,
     )
 agent_llm = initialize_llm(
-        name="Google",
+        name="VertexAI",
         model_name="gemini-2.5-flash",
         temperature=0.3,
         llm_max_retries=0,
     )   
 summary_llm = initialize_llm(
         name="Google",
-        model_name="gemini-2.5-flash",
+        model_name="gemini-2.5-pro",
         temperature=0.3,
         llm_max_retries=0,
     )
