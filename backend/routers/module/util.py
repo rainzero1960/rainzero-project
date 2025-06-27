@@ -199,7 +199,18 @@ def initialize_llm(name: str, model_name: str, temperature: float, top_p: float 
         credentials, project = google.auth.default()
         print(f"Using Google Cloud project: {project}")
         print(f"model_name: {model_name}, temperature: {temperature}, top_p: {top_p}")
-        if "gemini" in model_name:
+        if "gemini" in model_name and "preview" in model_name:
+            from langchain_google_vertexai import ChatVertexAI
+            llm = ChatVertexAI(
+                model_name=model_name,
+                temperature=temperature,
+                project=project,
+                location="global",
+                top_p=top_p if top_p else 1.0,
+                max_retries=llm_max_retries,
+                frequency_penalty=0.3
+            )
+        elif "gemini" in model_name:
             from langchain_google_vertexai import ChatVertexAI
             llm = ChatVertexAI(
                 model_name=model_name,
@@ -367,6 +378,9 @@ if __name__ == "__main__":
     #llm = initialize_llm("VertexAI", "claude-3-5-haiku@20241022", 0.5)
     #print(f"{llm.invoke('あなたの名前は？')}")
     #print(f"Initialized LLM: {llm}")
-    llm = initialize_llm("VertexAI", "meta/llama-3.3-70b-instruct-maas", 0.5)
+    #llm = initialize_llm("VertexAI", "meta/llama-3.3-70b-instruct-maas", 0.5)
+    #print(f"{llm.invoke('あなたの名前は？')}")
+    #print(f"Initialized LLM: {llm}")
+    llm = initialize_llm("VertexAI", "gemini-2.5-flash-lite-preview-06-17", 0.5)
     print(f"{llm.invoke('あなたの名前は？')}")
     print(f"Initialized LLM: {llm}")
