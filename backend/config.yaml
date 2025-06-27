@@ -42,13 +42,7 @@ model_settings:
         temperature_range: [0.0001, 1.0]
         top_p_range: [0.0001, 1.0]
 
-      VertexAI::meta/llama-4-maverick-17b-128e-instruct-maas:
-        provider: VertexAI
-        supports: [text]
-        temperature_range: [0.0001, 1.0]
-        top_p_range: [0.0001, 1.0]
-
-      VertexAI::meta/llama-4-scout-17b-16e-instruct-maas:
+      VertexAI::meta/meta/llama-3.3-70b-instruct-maas:
         provider: VertexAI
         supports: [text]
         temperature_range: [0.0001, 1.0]

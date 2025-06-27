@@ -183,3 +183,4 @@ psycopg2-binary
 bcrypt==4.1.2
 passlib[bcrypt]
 python-jose[cryptography]
+anthropic

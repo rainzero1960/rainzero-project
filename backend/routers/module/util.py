@@ -221,7 +221,7 @@ def initialize_llm(name: str, model_name: str, temperature: float, top_p: float 
             from langchain_google_vertexai.model_garden_maas import VertexModelGardenLlama
             llm = VertexModelGardenLlama(
                 project=project,
-                location="us-east5",
+                location="us-central1",
                 model_name=model_name,
                 temperature=temperature,
                 top_p=top_p if top_p else 1.0
@@ -360,3 +360,13 @@ def escape_curly_braces(text: str) -> str:
     LangChainのPromptTemplateで波括弧が変数として解釈されるのを防ぐ。
     """
     return text.replace("{", "{{").replace("}", "}}")
+
+if __name__ == "__main__":
+   
+    # LLMの初期化例
+    #llm = initialize_llm("VertexAI", "claude-3-5-haiku@20241022", 0.5)
+    #print(f"{llm.invoke('あなたの名前は？')}")
+    #print(f"Initialized LLM: {llm}")
+    llm = initialize_llm("VertexAI", "meta/llama-3.3-70b-instruct-maas", 0.5)
+    print(f"{llm.invoke('あなたの名前は？')}")
+    print(f"Initialized LLM: {llm}")
