@@ -1,0 +1,169 @@
+# project_root/config.yaml
+# 各モデルの設定と対応フォーマットを定義
+# supportsリストは現状 llm_loader.py では直接使用していませんが、
+# main.py でファイルアップロードUIの制御などに利用できます。
+# temperature_range, top_p_range もUIでのスライダー範囲設定に使えます。
+model_settings:
+  common:
+    default_model:
+      provider: VertexAI
+      model_name: Google::gemini-2.5-flash-lite-preview-06-17
+    default_models_by_provider:
+      VertexAI: VertexAI::gemini-2.5-flash-lite-preview-06-17
+
+    models:
+      VertexAI::gemini-2.5-pro:
+        provider: VertexAI
+        supports: [text]
+        temperature_range: [0.0001, 1.0]
+        top_p_range: [0.0001, 1.0]
+
+      VertexAI::gemini-2.5-flash:
+        provider: VertexAI
+        supports: [text]
+        temperature_range: [0.0001, 1.0]
+        top_p_range: [0.0001, 1.0]
+
+      VertexAI::gemini-2.5-flash-lite-preview-06-17:
+        provider: VertexAI
+        supports: [text]
+        temperature_range: [0.0001, 1.0]
+        top_p_range: [0.0001, 1.0]
+
+      VertexAI::gemini-2.0-flash-001:
+        provider: VertexAI
+        supports: [text]
+        temperature_range: [0.0001, 1.0]
+        top_p_range: [0.0001, 1.0]
+
+      VertexAI::gemini-2.0-flash-lite-001:
+        provider: VertexAI
+        supports: [text]
+        temperature_range: [0.0001, 1.0]
+        top_p_range: [0.0001, 1.0]
+
+  paper_page:
+    default_model:
+      provider: VertexAI
+      model_name: VertexAI::gemini-2.5-flash
+
+    default_models_by_provider:
+      VertexAI: VertexAI::gemini-2.5-flash
+
+    models:
+      VertexAI::gemini-1.5-flash:
+        provider: VertexAI
+        supports: [text]
+        temperature_range: [0.0001, 1.0]
+        top_p_range: [0.0001, 1.0]
+
+
+  paper_detail_page:
+    default_model:
+      provider: VertexAI
+      model_name: VertexAI::gemini-2.5-flash-lite-preview-06-17
+
+    default_models_by_provider:
+      OpenRouter: OpenRouter::deepseek/deepseek-chat-v3-0324:free
+      VertexAI: VertexAI::gemini-2.5-flash-lite-preview-06-17
+
+    models:
+      VertexAI::gemini-1.5-flash:
+        provider: VertexAI
+        supports: [text]
+        temperature_range: [0.0001, 1.0]
+        top_p_range: [0.0001, 1.0]
+
+  rag_page:
+    default_model:
+      provider: VertexAI
+      model_name: VertexAI::gemini-2.5-flash-lite-preview-06-17
+
+    default_models_by_provider:
+      VertexAI: VertexAI::gemini-2.5-flash-lite-preview-06-17
+
+    models:
+      VertexAI::gemini-1.5-flash:
+        provider: VertexAI
+        supports: [text]
+        temperature_range: [0.0001, 1.0]
+        top_p_range: [0.0001, 1.0]
+
+  #title_generation_llm:
+  #  provider: OpenRouter
+  #  model_name: deepseek/deepseek-chat-v3-0324:free
+  #  temperature: 0.0001
+  #  top_p: 0.0001
+
+  file_types:
+    text: ['.txt', '.md', '.log']
+    image: ['.png', '.jpg', '.jpeg', '.gif', '.webp']
+    pdf: ['.pdf']
+    audio: ['.mp3', '.wav', '.m4a', '.flac']
+    video: ['.mp4', '.mov', '.avi']
+
+# デフォルト設定 (オプション)
+# default_model: gpt-4o-mini
+# default_temperature: 0.7
+# default_top_p: 1.0
+
+# ファイルタイプと拡張子のマッピング (オプション)
+# file_types:
+#   text: [.txt, .md, .log]
+#   image: [.png, .jpg, .jpeg, .gif, .webp]
+#   pdf: [.pdf]
+#   audio: [.mp3, .wav, .m4a, .flac]
+#   video: [.mp4, .mov, .avi]
+
+# 特定用途のLLM設定
+specialized_llm_settings:
+  # タグ生成用LLM設定
+  tag_generation:
+    provider: VertexAI
+    model_name: gemini-2.5-flash-lite-preview-06-17
+    temperature: 0.1
+    top_p: 1.0
+    max_retries: 3
+
+  # フォールバックLLM設定（タグ生成失敗時）
+  tag_fallback:
+    provider: VertexAI
+    model_name: gemini-2.5-flash-lite-preview-06-17
+    temperature: 0.1
+    top_p: 1.0
+    max_retries: 3
+
+  # 要約生成フォールバックLLM設定
+  summary_fallback:
+    provider: VertexAI
+    model_name: gemini-2.5-flash-lite-preview-06-17
+    temperature: 0.7
+    top_p: 1.0
+    max_retries: 3
+
+  # デフォルト要約LLM設定（フォールバック）基本的には設定されたモデルを使うので、これは利用しない
+  summary_default:
+    provider: VertexAI
+    model_name: gemini-2.5-flash-lite-preview-06-17
+    temperature: 0.7
+    top_p: 1.0
+    max_retries: 3
+
+# 末尾または適切な位置に追加
+local_vector_store:
+  type: chroma
+  persist_dir: ./database/vector_db
+  collection: papers
+  provider: VertexAI
+  embedding_model: text-multilingual-embedding-002
+
+bq_vector_store:
+  type: bigquery_vector_search # 識別用
+  project_id: "" # 環境変数 BIGQUERY_PROJECT_ID で上書き可能
+  dataset_name: "knowledgepaper_game_vector_store" # 例
+  table_name: "papers_embeddings" # 例
+  location: "asia-northeast1" # Vertex AI Embeddingが利用可能なリージョン
+  distance_strategy: "COSINE" # または EUCLIDEAN, DOT_PRODUCT
+  provider: VertexAI
+  embedding_model: text-multilingual-embedding-002
+

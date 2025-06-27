@@ -1,0 +1,56 @@
+# knowledgepaper/Dockerfile.frontend
+
+# === ステージ 1: ビルドステージ ===
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# ★ ビルド引数を受け取る定義を追加
+ARG NEXT_PUBLIC_BACKEND_URL_ARG
+
+# ★ 受け取ったビルド引数をビルド時の環境変数として設定
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL_ARG
+
+# pnpm をインストール
+RUN npm install -g pnpm
+
+# package.json と pnpm-lock.yaml をコピー
+COPY package.json pnpm-lock.yaml ./
+
+# 依存関係をインストール
+RUN pnpm install --frozen-lockfile
+
+# ソースコードと設定ファイルをコピー
+COPY src ./src
+COPY public ./public
+COPY next.config.ts ./
+COPY tsconfig.json ./
+COPY postcss.config.mjs ./
+# 他に必要な設定ファイルがあればコピー (例: tailwind.config.js)
+# COPY tailwind.config.js ./
+
+# Next.js アプリケーションをビルド (standalone モードで)
+# next.config.ts で output: 'standalone' が設定されていること
+RUN npm run build
+
+# === ステージ 2: 本番ステージ ===
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+# Cloud Run が提供する PORT 環境変数を Next.js がリッスンするように設定 (推奨)
+ENV PORT 8080
+
+# ビルドステージから standalone 出力をコピー
+# standalone 出力は依存関係を含むため、node_modules のコピーは不要
+COPY --from=builder /app/.next/standalone ./
+# ビルドステージから静的ファイルをコピー
+COPY --from=builder /app/.next/static ./.next/static
+# public ディレクトリをコピー
+COPY --from=builder /app/public ./public
+
+# ポートを開放 (Cloud Run は PORT 環境変数を見る)
+EXPOSE 8080
+
+# アプリケーションを実行
+# standalone 出力に含まれる server.js を実行
+CMD ["node", "server.js"]
