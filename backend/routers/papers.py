@@ -466,6 +466,26 @@ LEVEL_TAGS_FROM_FRONTEND = ['お気に入り', '理解した', 'サラッと読�
 ACTUAL_LEVEL_TAGS_FOR_DB_QUERY = [tag for tag in LEVEL_TAGS_FROM_FRONTEND if tag not in ['理解度タグなし', 'Recommended', '興味なし']]
 
 
+def create_tag_exact_match_condition(tag_column, tag):
+    """
+    タグの完全一致条件を作成するヘルパー関数
+    タグはコンマ区切りで保存されているため、境界を考慮した条件を作成
+    
+    Args:
+        tag_column: SQLAlchemyのカラムオブジェクト (例: UserPaperLink.tags)
+        tag: 検索するタグ文字列
+    
+    Returns:
+        SQLAlchemyの条件式
+    """
+    return or_(
+        tag_column == tag,                          # タグ全体が完全一致
+        tag_column.like(f'{tag},%'),               # タグが先頭にある
+        tag_column.like(f'%,{tag},%'),             # タグが中間にある
+        tag_column.like(f'%,{tag}')                # タグが末尾にある
+    )
+
+
 @router.get("/tags_summary", response_model=Dict[str, int])
 def get_user_tags_summary(
     session: Session = Depends(get_session),
@@ -531,7 +551,7 @@ def list_user_papers(
     conditions = [UserPaperLink.user_id == current_user.id]
 
     if not show_interest_none:
-        conditions.append(not_(UserPaperLink.tags.contains("興味なし")))
+        conditions.append(not_(create_tag_exact_match_condition(UserPaperLink.tags, "興味なし")))
 
     
     active_level_tags_from_query = [tag for tag in (level_tags or []) if tag != "理解度タグなし"]
@@ -540,12 +560,12 @@ def list_user_papers(
     level_tag_sub_conditions = []
     if active_level_tags_from_query:
         if filter_mode == "AND":
-            level_tag_sub_conditions.extend([UserPaperLink.tags.contains(tag) for tag in active_level_tags_from_query])
+            level_tag_sub_conditions.extend([create_tag_exact_match_condition(UserPaperLink.tags, tag) for tag in active_level_tags_from_query])
         else: 
-            level_tag_sub_conditions.append(or_(*[UserPaperLink.tags.contains(tag) for tag in active_level_tags_from_query]))
+            level_tag_sub_conditions.append(or_(*[create_tag_exact_match_condition(UserPaperLink.tags, tag) for tag in active_level_tags_from_query]))
 
     if apply_no_level_tag_filter:
-        no_actual_level_tag_cond = not_(or_(*[UserPaperLink.tags.contains(lt) for lt in ACTUAL_LEVEL_TAGS_FOR_DB_QUERY]))
+        no_actual_level_tag_cond = not_(or_(*[create_tag_exact_match_condition(UserPaperLink.tags, lt) for lt in ACTUAL_LEVEL_TAGS_FOR_DB_QUERY]))
         if filter_mode == "AND" and active_level_tags_from_query:
              level_tag_sub_conditions.append(no_actual_level_tag_cond)
         elif filter_mode == "OR" or not active_level_tags_from_query:
@@ -557,9 +577,9 @@ def list_user_papers(
     domain_tag_sub_conditions = []
     if domain_tags:
         if filter_mode == "AND":
-            domain_tag_sub_conditions.extend([UserPaperLink.tags.contains(tag) for tag in domain_tags])
+            domain_tag_sub_conditions.extend([create_tag_exact_match_condition(UserPaperLink.tags, tag) for tag in domain_tags])
         else: 
-            domain_tag_sub_conditions.append(or_(*[UserPaperLink.tags.contains(tag) for tag in domain_tags]))
+            domain_tag_sub_conditions.append(or_(*[create_tag_exact_match_condition(UserPaperLink.tags, tag) for tag in domain_tags]))
 
     
     if level_tag_sub_conditions and domain_tag_sub_conditions:

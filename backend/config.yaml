@@ -146,7 +146,7 @@ specialized_llm_settings:
     provider: VertexAI
     model_name: gemini-2.5-flash-lite-preview-06-17
     temperature: 0.1
-    top_p: 1.0
+    top_p: 0.95
     max_retries: 3
 
   # フォールバックLLM設定（タグ生成失敗時）
@@ -154,7 +154,7 @@ specialized_llm_settings:
     provider: VertexAI
     model_name: gemini-2.0-flash-001
     temperature: 0.1
-    top_p: 1.0
+    top_p: 0.95
     max_retries: 3
 
   # 要約生成フォールバックLLM設定
@@ -162,7 +162,7 @@ specialized_llm_settings:
     provider: VertexAI
     model_name: gemini-2.5-flash-lite-preview-06-17
     temperature: 0.7
-    top_p: 1.0
+    top_p: 0.95
     max_retries: 3
 
   # デフォルト要約LLM設定（フォールバック）基本的には設定されたモデルを使うので、これは利用しない
@@ -170,7 +170,7 @@ specialized_llm_settings:
     provider: VertexAI
     model_name: gemini-2.5-flash-lite-preview-06-17
     temperature: 0.7
-    top_p: 1.0
+    top_p: 0.95
     max_retries: 3
 
 # 末尾または適切な位置に追加

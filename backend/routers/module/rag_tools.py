@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional
 from langchain_tavily import TavilySearch, TavilyExtract
 # from langchain_core.tools import tool # @tool は rag.py で適用するため、ここでは不要
 from sqlmodel import Session, select
+from sqlalchemy import or_
 
 # models, db, EMBED などを適切にインポートする
 from models import UserPaperLink, PaperMetadata
@@ -17,6 +18,26 @@ import re
 # search_results の値はconfigなどから取得できるようにすると良い
 tavily_web_search = TavilySearch(max_results=10, name="web_search_tool")
 tavily_web_extract = TavilyExtract(name="web_extract_tool")
+
+
+def create_tag_exact_match_condition(tag_column, tag):
+    """
+    タグの完全一致条件を作成するヘルパー関数
+    タグはコンマ区切りで保存されているため、境界を考慮した条件を作成
+    
+    Args:
+        tag_column: SQLAlchemyのカラムオブジェクト (例: UserPaperLink.tags)
+        tag: 検索するタグ文字列
+    
+    Returns:
+        SQLAlchemyの条件式
+    """
+    return or_(
+        tag_column == tag,                          # タグ全体が完全一致
+        tag_column.like(f'{tag},%'),               # タグが先頭にある
+        tag_column.like(f'%,{tag},%'),             # タグが中間にある
+        tag_column.like(f'%,{tag}')                # タグが末尾にある
+    )
 
 # --- 既存のRAG検索ツール ---
 # 注意: この関数は rag.py のコンテキストで実行されるため、
@@ -43,7 +64,7 @@ def local_rag_search_tool_impl(
         tag_list = [t.strip() for t in tags.split(",") if t.strip()]
         if tag_list:
             for t_item in tag_list:
-                user_paper_links_query = user_paper_links_query.where(UserPaperLink.tags.contains(t_item))
+                user_paper_links_query = user_paper_links_query.where(create_tag_exact_match_condition(UserPaperLink.tags, t_item))
     
     relevant_user_paper_links = db_session.exec(user_paper_links_query).all()
 
