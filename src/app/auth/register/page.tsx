@@ -15,7 +15,7 @@ export default function RegisterPage() {
 
   // ▼▼▼ 追加: ユーザー登録機能の有効/無効を切り替えるフラグ ▼▼▼
   // falseに設定すると、登録フォームが無効になります。
-const registrationEnabled = true; // ここをfalseにすると登録機能が無効になります
+const registrationEnabled = false; // ここをfalseにすると登録機能が無効になります
   // ▲▲▲ ▲▲▲ ▲▲▲
 
   const router = useRouter();
